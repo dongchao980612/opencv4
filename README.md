@@ -144,13 +144,148 @@ Mat dst_div = Mat::zeros(src.size(), src.type());
 m = Scalar(5, 5, 5);
 divide(src, m, dst_div);
 ```
-
 ## 第2章 滚动条与键盘事件
 06 滚动条操作1.0 - 调整图像亮度
-07 滚动条操作2.0 - 调整亮度与对比度
-08 键盘响应操作
-09 Opencv自带颜色表操作
+```c++
+static void on_light(int pos, void* userdata) {
+	Mat src = *(Mat*)(userdata);
+	Mat dst = Mat::zeros(src.size(), src.type());
+	Mat m = Mat::zeros(src.size(), src.type());
+	m = Scalar(pos, pos, pos);
 
+	add(src, m, dst);
+
+	imshow(winname, dst);	
+}
+
+createTrackbar("light", winname, &light, max_light_value, on_light,&src);
+```
+07 滚动条操作2.0 - 调整亮度与对比度
+```c++
+static void on_light(int pos, void* userdata) {
+	Mat src = *(Mat*)(userdata);
+	Mat dst = Mat::zeros(src.size(), src.type());
+	Mat m = Mat::zeros(src.size(), src.type());
+	m = Scalar(pos, pos, pos);
+
+	add(src, m, dst);
+
+	imshow(winname, dst);
+}
+
+static void on_contrast(int pos, void* userdata) {
+	Mat src = *(Mat*)(userdata);
+	Mat dst = Mat::zeros(src.size(), src.type());
+	Mat m = Mat::zeros(src.size(), src.type());
+	m = Scalar(pos, pos, pos);
+
+	double alpha = pos / 100.0;
+	addWeighted(src, alpha, m, 0.0, 0.0, dst);
+
+	imshow(winname, dst);
+}
+
+createTrackbar("light", winname, &light, max_light_value, on_light, (void*)&src);
+createTrackbar("constast", winname, &constast, max_constast_value, on_contrast, (void*)&src);
+```
+08 键盘响应操作
+```c++
+while (true)
+{
+	imshow("键盘响应", dst);
+	imshow("src", src);
+
+	ch = waitKey(1);
+	// cout << ch <<  endl;
+
+	if (ch == 49) {
+		cvtColor(src, dst, COLOR_BGR2GRAY);
+	}
+
+	if (ch == 50) {
+		cvtColor(src, dst, COLOR_BGR2HSV);
+	}
+
+	if (ch == 51) {
+		dst = Scalar(50, 50, 50);
+		add(src, dst, dst);
+	}
+
+	if (ch == 27) {
+		destroyAllWindows();
+		break;
+	}	
+}
+```
+09 Opencv自带颜色表操作
+```c++
+const vector<string> colormap_str{
+	"COLORMAP_AUTUMN",
+	"COLORMAP_BONE",
+	"COLORMAP_JET",
+	"COLORMAP_WINTER",
+	"COLORMAP_RAINBOW",
+	"COLORMAP_OCEAN",
+	"COLORMAP_SUMMER",
+	"COLORMAP_SPRING",
+	"COLORMAP_COOL",
+	"COLORMAP_HSV",//10
+	"COLORMAP_PINK",
+	"COLORMAP_HOT",
+	"COLORMAP_PARULA",
+	"COLORMAP_MAGMA",
+	"COLORMAP_INFERNO",
+	"COLORMAP_PLASMA",
+	"COLORMAP_VIRIDIS",
+	"COLORMAP_CIVIDIS",
+	"COLORMAP_TWILIGHT",
+	"COLORMAP_TWILIGHT_SHIFTED",
+	"COLORMAP_TURBO",
+	"COLORMAP_DEEPGREEN"
+
+};
+
+const vector<int> colormap = {
+	COLORMAP_AUTUMN,
+	COLORMAP_BONE,
+	COLORMAP_JET,
+	COLORMAP_WINTER,
+	COLORMAP_RAINBOW,
+	COLORMAP_OCEAN,
+	COLORMAP_SUMMER,
+	COLORMAP_SPRING,
+	COLORMAP_COOL,
+	COLORMAP_HSV,//10
+	COLORMAP_PINK,
+	COLORMAP_HOT,
+	COLORMAP_PARULA,
+	COLORMAP_MAGMA,
+	COLORMAP_INFERNO,
+	COLORMAP_PLASMA,
+	COLORMAP_VIRIDIS,
+	COLORMAP_CIVIDIS,
+	COLORMAP_TWILIGHT,
+	COLORMAP_TWILIGHT_SHIFTED,//20
+	COLORMAP_TURBO,
+	COLORMAP_DEEPGREEN
+
+};
+
+int len = colormap.size();
+
+while (true)
+{
+	applyColorMap(src, dst, colormap[index++ % len]);
+
+	putText(dst, colormap_str[index++ % len], Point(50, 50), cv::HersheyFonts::FONT_HERSHEY_COMPLEX, 1, (128, 128, 128), 2, cv::LineTypes::LINE_AA);
+	if (waitKey(1000) == 27) {
+		destroyAllWindows();
+		break;
+	}
+
+	imshow("src", dst);
+}
+```
 ## 第3章 图像处理与鼠标事件
 
 10 图像像素的逻辑操作
