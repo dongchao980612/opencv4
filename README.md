@@ -590,7 +590,80 @@ warpAffine(src, dst, M, Size(nw, nh), INTER_LINEAR, 0, Scalar(0, 200, 0)); // �
 
 ## 第4章 视频处理
 ### 22 视频文件摄像头使用
+
+```c++
+VideoCapture capture("demo.mp4");
+
+Mat frame;
+
+while (true)
+{
+	capture.read(frame);
+	if (frame.empty()) {
+		cout << "frame.empty()" << endl;
+		break;
+	}
+	Mat gray = Mat::zeros(frame.size(), frame.type());
+	Mat hsv = Mat::zeros(frame.size(), frame.type());
+	cvtColor(frame, gray, COLOR_BGR2HSV);
+	cvtColor(frame, hsv, COLOR_BGR2GRAY);
+
+	// flip(frame, frame, 1);
+
+	imshow("gray", gray);
+	imshow("hsv", hsv);
+	imshow("src", frame);
+	if (waitKey(10) == 27) {
+		break; // 退出
+	}
+}
+capture.release();
+```
+
 ### 23 视频处理与保存
+
+```c++
+VideoCapture capture("demo.mp4");
+
+int frame_width = capture.get(CAP_PROP_FRAME_WIDTH);
+int frame_height = capture.get(CAP_PROP_FRAME_HEIGHT);
+int frame_count = capture.get(CAP_PROP_FRAME_COUNT);
+double fps = capture.get(CAP_PROP_FPS);
+
+VideoWriter  writer("demo_saved.mp4", capture.get(CAP_PROP_FOURCC), fps, Size(frame_width, frame_height), true);
+
+cout << "frame_width:" << frame_width << endl;
+cout << "frame_height:" << frame_height << endl;
+cout << "frame_count:" << frame_count << endl;
+cout << "fps:" << fps << endl;
+
+
+Mat frame;
+int count = 1;
+while (true)
+{
+	capture.read(frame);
+	if (frame.empty()) {
+		cout << "frame.empty()" << endl;
+		break;
+	}
+
+	// namedWindow("src", WINDOW_FREERATIO);
+	// imshow("src", frame);
+	writer.write(frame);
+
+	// cout << "save [" << count++ << "," << frame_count << "]..." << endl;
+
+	if (waitKey(1) == 27) {
+		break; // 退出
+	}
+}
+
+capture.release();
+writer.release();
+```
+
+
 
 ## 第5章 直方图与卷积
 
